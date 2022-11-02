@@ -1,0 +1,117 @@
+import re, requests, html
+
+
+class Ads:
+    def __init__(self):
+        self.webhook_sky = "https://discord.com/api/webhooks/1037226844677746688/5Udm-2BZ6GcaT37zPiugJCxzLQd4Y2dfIqFIJkAQSE3QQuX3P5TKYM54mvJDvrushSfI"
+        self.webhook_banner = "https://discord.com/api/webhooks/1037226844677746688/5Udm-2BZ6GcaT37zPiugJCxzLQd4Y2dfIqFIJkAQSE3QQuX3P5TKYM54mvJDvrushSfI"
+        self.webhook_box = "https://discord.com/api/webhooks/1037226844677746688/5Udm-2BZ6GcaT37zPiugJCxzLQd4Y2dfIqFIJkAQSE3QQuX3P5TKYM54mvJDvrushSfI"
+        self.sky_list = []
+        self.box_list = []
+        self.banner_list = []
+
+    def sender(self, ad, url, name):
+        if ad == "banner":
+            data = {"content": "New %s Ad Found" % ad}
+            data["embeds"] = [
+                {"title": str(html.unescape(name)), "image": {"url": url}}
+            ]
+            with requests.Session() as sess:
+                r = sess.post(
+                    self.webhook_banner,
+                    json=data,
+                )
+        elif ad == "sky":
+            data = {"content": "New %s Ad Found" % ad}
+            data["embeds"] = [
+                {"title": str(html.unescape(name)), "image": {"url": url}}
+            ]
+            with requests.Session() as sess:
+                r = sess.post(
+                    self.webhook_sky,
+                    json=data,
+                )
+        elif ad == "box":
+            data = {"content": "New %s Ad Found" % ad}
+            data["embeds"] = [
+                {"title": str(html.unescape(name)), "image": {"url": url}}
+            ]
+            with requests.Session() as sess:
+                r = sess.post(
+                    self.webhook_box,
+                    json=data,
+                )
+
+    def Banner(self):
+        url = "https://www.roblox.com/user-sponsorship/1"
+        with requests.Session() as sess:
+            r = sess.get(url)
+        name_first_span = re.search(" alt=", r.text).span()[1]
+        name_second_span = re.search(" height", r.text).span()[0]
+        combined_name = r.text[name_first_span:name_second_span]
+        full_name = str(combined_name).replace('"', "")
+        if full_name in self.banner_list:
+            return "Dupe"
+        else:
+            self.banner_list.append(full_name)
+            img_first_span = re.search("<img src=", r.text).span()[1]
+            image_second_span = re.search(" alt", r.text).span()[0]
+            combined_image = r.text[img_first_span:image_second_span]
+            link = str(combined_image).replace('"', "")
+            self.sender("banner", link, full_name)
+
+    def Sky_Scraper(self):
+        url = "https://www.roblox.com/user-sponsorship/2"
+        with requests.Session() as sess:
+            r = sess.get(url)
+        name_first_span = re.search(" alt=", r.text).span()[1]
+        name_second_span = re.search(" height", r.text).span()[0]
+        combined_name = r.text[name_first_span:name_second_span]
+        full_name = str(combined_name).replace('"', "")
+        if full_name in self.banner_list:
+            return "Dupe"
+        else:
+            self.sky_list.append(full_name)
+            img_first_span = re.search("<img src=", r.text).span()[1]
+            image_second_span = re.search(" alt", r.text).span()[0]
+            combined_image = r.text[img_first_span:image_second_span]
+            link = str(combined_image).replace('"', "")
+            self.sender("sky", link, full_name)
+
+    def Box(self):
+        url = "https://www.roblox.com/user-sponsorship/3"
+        with requests.Session() as sess:
+            r = sess.get(url)
+        name_first_span = re.search(" alt=", r.text).span()[1]
+        name_second_span = re.search(" height", r.text).span()[0]
+        combined_name = r.text[name_first_span:name_second_span]
+        full_name = str(combined_name).replace('"', "")
+        if full_name in self.box_list:
+            return "Dupe"
+        else:
+            self.box_list.append(full_name)
+            img_first_span = re.search("<img src=", r.text).span()[1]
+            image_second_span = re.search(" alt", r.text).span()[0]
+            combined_image = r.text[img_first_span:image_second_span]
+            link = str(combined_image).replace('"', "")
+            self.sender("box", link, full_name)
+
+    def Run(self):
+        while True:
+            banner = self.Banner()
+            box = self.Box()
+            sky = self.Sky_Scraper()
+            if banner == "Dupe":
+                continue
+            if box == "Dupe":
+                continue
+            if sky == "Dupe":
+                continue
+
+
+def main():
+    Main = Ads()
+    Main.Run()
+
+
+main()
